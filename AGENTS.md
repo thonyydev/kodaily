@@ -162,6 +162,8 @@ Direção: **Minimal Terminal 2.0**, escuro por padrão, ferramenta nativa premi
 - Área de toque mínima próxima de 44×44 pt; feedback tátil apenas onde fizer sentido e for compatível com Expo Go.
 - Respeitar acessibilidade, textos escaláveis, contraste, label de inputs e navegação por leitor de tela.
 - Microinterações discretas, sem prejudicar FPS ou bloquear tarefas.
+- Minimalismo se refere à composição e à clareza, não à remoção de recursos técnicos. Preservar recursos úteis do Reacticx, incluindo blur, haptics, gestos e animações, ajustando a intensidade à identidade existente.
+- Usar `expo-blur` e `expo-haptics` nas versões compatíveis com Expo Go 58. Providers de interação são permitidos quando centralizam padrões e acessibilidade; respeitar movimento/transparência reduzidos e documentar diferenças de plataforma.
 - **Não usar** imagens stock, gradientes exagerados, efeitos pesados ou componentes nativos indisponíveis no Expo Go apenas para parecer sofisticado.
 - Textos e mensagens do aplicativo em **português do Brasil**; nomes técnicos e código em inglês.
 

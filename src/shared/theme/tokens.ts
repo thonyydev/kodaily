@@ -34,6 +34,18 @@ export const spacing = {
 } as const;
 export const radii = { sm: 4, md: 6, lg: 10, pill: 999 } as const;
 
+export const motion = {
+  pressScale: 0.98,
+  pressDuration: 100,
+  longPressScale: 0.96,
+  longPressDuration: 500,
+  spring: { damping: 26, stiffness: 360, mass: 0.7 },
+} as const;
+
+export const effects = {
+  buttonBlur: { intensity: 12, pressedIntensity: 20 },
+} as const;
+
 export const typography = {
   title: {
     fontSize: 28,
