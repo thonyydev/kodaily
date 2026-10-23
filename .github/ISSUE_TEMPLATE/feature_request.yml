@@ -1,0 +1,26 @@
+name: Feature request
+description: Sugira uma melhoria ou funcionalidade do Kodaily
+title: 'feat: '
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema ou necessidade
+      description: Qual problema real essa ideia resolve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Solução proposta
+      description: Descreva o comportamento esperado e o valor para o usuário.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critérios de aceitação
+      placeholder: |
+        - [ ] ...
+    validations:
+      required: false

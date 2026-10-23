@@ -1,0 +1,38 @@
+name: Bug report
+description: Reporte um problema no Kodaily
+title: 'fix: '
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição
+      description: O que aconteceu e qual era o resultado esperado?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Passos para reproduzir
+      placeholder: |
+        1. Abra...
+        2. Toque em...
+        3. Observe...
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Plataforma
+      options:
+        - iOS / Expo Go
+        - Android / Expo Go
+        - Development build
+        - Outro
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs e evidências (sem tokens ou dados privados)
+    validations:
+      required: false

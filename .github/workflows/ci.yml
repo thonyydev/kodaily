@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: ESLint
+        run: npm run lint --if-present
+
+      - name: Expo Doctor
+        run: npx --yes expo-doctor@latest
+
+      # Quando adicionar testes, defina `test:ci` no package.json.
+      - name: Unit tests (when configured)
+        run: npm run test:ci --if-present
