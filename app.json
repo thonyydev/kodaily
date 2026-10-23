@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "kodaily",
+    "name": "Kodaily",
     "slug": "kodaily",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "kodaily",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0C1116",
     "ios": {
       "icon": "./assets/expo.icon"
     },
@@ -28,9 +29,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#0C1116"
         }
       ],
       "expo-sqlite"

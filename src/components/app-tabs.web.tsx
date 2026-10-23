@@ -1,120 +1,116 @@
 import {
-  Tabs,
   TabList,
-  TabTrigger,
   TabSlot,
-  TabTriggerSlotProps,
-  TabListProps,
+  Tabs,
+  TabTrigger,
+  type TabTriggerSlotProps,
 } from 'expo-router/ui';
-import { SymbolView } from 'expo-symbols';
-import type { ComponentProps } from 'react';
-import { Pressable, useColorScheme, View, StyleSheet } from 'react-native';
+import { useState, type AriaAttributes, type ComponentProps } from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 
-import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
-
-import { ExternalLink } from './external-link';
-import { ThemedText } from './themed-text';
-import { ThemedView } from './themed-view';
+import { AppIcon, type AppIconName } from '@/components/ui/app-icon';
+import { AppText } from '@/components/ui/app-text';
+import { colors, radii, sizes, spacing } from '@/shared/theme';
 
 export default function AppTabs() {
   return (
-    <Tabs>
-      <TabSlot style={{ height: '100%' }} />
-      <TabList asChild>
-        <CustomTabList>
-          <TabTrigger name="home" href="/" asChild>
-            <TabButton>Home</TabButton>
-          </TabTrigger>
-          <TabTrigger name="explore" href="/explore" asChild>
-            <TabButton>Explore</TabButton>
-          </TabTrigger>
-        </CustomTabList>
+    <Tabs style={styles.tabs}>
+      <TabSlot style={styles.slot} />
+      <TabList
+        role="navigation"
+        accessibilityLabel="Navegação principal"
+        style={styles.tabList}>
+        <TabTrigger name="today" href="/" asChild>
+          <TabButton icon="home">Hoje</TabButton>
+        </TabTrigger>
+        <TabTrigger name="projects" href="/projects" asChild>
+          <TabButton icon="folder">Projetos</TabButton>
+        </TabTrigger>
+        <TabTrigger name="history" href="/history" asChild>
+          <TabButton icon="history">Histórico</TabButton>
+        </TabTrigger>
+        <TabTrigger name="profile" href="/profile" asChild>
+          <TabButton icon="person">Perfil</TabButton>
+        </TabTrigger>
       </TabList>
     </Tabs>
   );
 }
 
-// Router 58 types the ref as View; RN's strict API uses the Pressable instance.
+// Router 58 supplies a View ref; Pressable requires its own instance type in RN 0.88.
 type TabButtonProps = Omit<TabTriggerSlotProps, 'ref'> &
-  Pick<ComponentProps<typeof Pressable>, 'ref'>;
+  Pick<ComponentProps<typeof Pressable>, 'ref'> & { icon: AppIconName };
 
-export function TabButton({ children, isFocused, ...props }: TabButtonProps) {
+function TabButton({ children, isFocused, icon, ...props }: TabButtonProps) {
+  const [focused, setFocused] = useState(false);
+  const currentPageProps: Pick<AriaAttributes, 'aria-current'> = {
+    'aria-current': isFocused ? 'page' : undefined,
+  };
   return (
-    <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
-      <ThemedView
-        type={isFocused ? 'backgroundSelected' : 'backgroundElement'}
-        style={styles.tabButtonView}>
-        <ThemedText type="small" themeColor={isFocused ? 'text' : 'textSecondary'}>
-          {children}
-        </ThemedText>
-      </ThemedView>
+    <Pressable
+      {...props}
+      {...currentPageProps}
+      accessibilityRole="link"
+      onFocus={(event) => {
+        setFocused(true);
+        props.onFocus?.(event);
+      }}
+      onBlur={(event) => {
+        setFocused(false);
+        props.onBlur?.(event);
+      }}
+      style={({ pressed }) => [
+        styles.tab,
+        isFocused && styles.selected,
+        pressed && styles.pressed,
+        focused && styles.focused,
+      ]}>
+      <AppIcon
+        name={icon}
+        color={isFocused ? 'accent' : 'textMuted'}
+        size={sizes.iconSmall}
+      />
+      <AppText
+        variant="caption"
+        color={isFocused ? 'accent' : 'textMuted'}
+        style={styles.label}>
+        {children}
+      </AppText>
     </Pressable>
   );
 }
 
-export function CustomTabList(props: TabListProps) {
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
-
-  return (
-    <View {...props} style={styles.tabListContainer}>
-      <ThemedView type="backgroundElement" style={styles.innerContainer}>
-        <ThemedText type="smallBold" style={styles.brandText}>
-          Expo Starter
-        </ThemedText>
-
-        {props.children}
-
-        <ExternalLink href="https://docs.expo.dev" asChild>
-          <Pressable style={styles.externalPressable}>
-            <ThemedText type="link">Docs</ThemedText>
-            <SymbolView
-              tintColor={colors.text}
-              name={{ ios: 'arrow.up.right.square', web: 'link' }}
-              size={12}
-            />
-          </Pressable>
-        </ExternalLink>
-      </ThemedView>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  tabListContainer: {
-    position: 'absolute',
-    width: '100%',
-    padding: Spacing.three,
-    justifyContent: 'center',
-    alignItems: 'center',
+  tabs: { flex: 1, backgroundColor: colors.background },
+  slot: { flex: 1 },
+  tabList: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: spacing.xs,
+    gap: spacing.xxs,
+    backgroundColor: colors.surface,
+    borderTopWidth: sizes.border,
+    borderColor: colors.border,
   },
-  innerContainer: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.five,
-    borderRadius: Spacing.five,
-    flexDirection: 'row',
-    alignItems: 'center',
+  tab: {
     flexGrow: 1,
-    gap: Spacing.two,
-    maxWidth: MaxContentWidth,
-  },
-  brandText: {
-    marginRight: 'auto',
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  tabButtonView: {
-    paddingVertical: Spacing.one,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.three,
-  },
-  externalPressable: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexBasis: 0,
+    minWidth: sizes.touchTarget,
+    minHeight: sizes.touchTarget,
     alignItems: 'center',
-    gap: Spacing.one,
-    marginLeft: Spacing.three,
+    justifyContent: 'center',
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.xxs,
+    gap: spacing.xxs,
+    borderRadius: radii.sm,
   },
+  selected: { backgroundColor: colors.accentSubtle },
+  pressed: { backgroundColor: colors.pressed },
+  focused: {
+    outlineColor: colors.focus,
+    outlineWidth: sizes.focusRing,
+    outlineStyle: 'solid',
+    outlineOffset: -sizes.focusRing,
+  },
+  label: { textAlign: 'center' },
 });

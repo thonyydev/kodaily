@@ -146,10 +146,15 @@ Adaptar apenas quando a estrutura existente tornar outra organização clarament
 
 ## 5. Design system — visual Kodaily
 
-Direção: **minimalismo premium para devs**, escuro por padrão, sensação de ferramenta focada e agradável, não de dashboard empresarial genérico.
+Direção: **Minimal Terminal 2.0**, escuro por padrão, ferramenta nativa premium para devs com personalidade de terminal/Linux. Preservar a hierarquia e o respiro do Minimal Terminal; dar identidade aos elementos existentes em vez de acrescentar decoração.
 
 - Paleta semântica própria: `background`, `surface`, `surfaceElevated`, `border`, `text`, `textMuted`, `accent`, `success`, `warning`, `danger`.
-- Base graphite/near-black, acento índigo/violeta discreto; acessibilidade acima de efeito visual.
+- Preservar fundo graphite/near-black azulado e acento ciano `#81C8D0` para ações e destaques importantes. Verde para sucesso real, âmbar para avisos reais e tons neutros para conteúdo secundário.
+- Sans para títulos, leitura, botões e navegação; mono somente para duração, datas, horários, status reais, metadados e identificadores técnicos curtos. Referências Linux complementam nomes claros em português.
+- Separar conteúdo com espaço, alinhamento e tipografia. Evitar headers de terminal, caminhos repetidos, indicadores decorativos, cards aninhados e bordas sem função.
+- Usar no máximo um ou dois detalhes técnicos marcantes por tela. Identificadores como `atividade.log`, `~/projetos` e `perfil.sys` substituem ícones existentes, sem formar árvores, logs ou comandos simulados. Títulos e ações continuam claros em português.
+- Cada seção tem um único destaque dominante. O painel de foco usa superfície e borda neutras; o CTA concentra o ciano. Símbolos de prompt identitários não representam comandos ou estados de execução.
+- Na Home, priorizar marca/contexto do dia, mensagem curta, “Iniciar sessão” e atividade recente. Introduzir métricas somente quando houver dados reais e utilidade; não manter blocos preparatórios vazios de estatísticas.
 - Escala consistente para `spacing`, `radii`, tipografia e estados de interação.
 - Botões, inputs, cards, badges, banners e skeletons reutilizáveis; sem overengineering.
 - Componentes reagem aos estados `loading`, `error`, `empty`, `success`, `disabled` e `submitting`.
