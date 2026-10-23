@@ -24,8 +24,11 @@ src/
     history/screens/
     profile/screens/
     sessions/screens/
-  shared/theme/                 # tokens Minimal Terminal e tema de navegação
-tests/theme.test.mjs             # contraste e dimensões mínimas de interação
+  shared/
+    components/atoms/pressable/  # Reacticx adaptado, consumido por AppButton
+    types/pressable/            # reexport do tipo público, sem duplicação
+    theme/                      # tokens Minimal Terminal e tema de navegação
+tests/                          # contraste, dimensões e contrato de pressão
 ```
 
 As rotas reexportam telas das features. Os aliases `@/*` e `@/assets/*` foram preservados. Não há diretórios vazios, providers remotos ou abstrações para funcionalidades ainda ausentes. Hooks, utilitários, repositórios e integrações serão adicionados quando houver uso concreto, nos locais definidos em `AGENTS.md`.
@@ -43,7 +46,9 @@ As rotas reexportam telas das features. Os aliases `@/*` e `@/assets/*` foram pr
 
 ## Dependências e assets
 
-Priorizar os pacotes instalados. `expo-symbols` fornece ícones nas três plataformas; a tipografia usa fontes do sistema. Não há nova biblioteca de UI, animação ou navegação.
+Priorizar os pacotes instalados. `expo-symbols` fornece ícones nas três plataformas; a tipografia usa fontes do sistema. O único componente Reacticx copiado é o `pressable`, com seus recursos de provider, animações, long press, feedback e blur preservados e adaptados ao AppButton. Além de Reanimated/Worklets existentes, usa `expo-blur ~58.0.5` e `expo-haptics ~58.0.7`, instalados pelo Expo para o SDK 58/Expo Go. A licença MIT permanece junto ao código. A configuração `component.config.json` resolve os padrões do CLI sem precisar explicitá-los; não executar `init` novamente. Detalhes de acessibilidade e diferenças por plataforma em `design-system.md`.
+
+O `PressableProvider` fica dentro do ThemeProvider na raiz, sem mudar Stack ou abas. Centraliza os padrões e observa movimento/transparência reduzidos uma vez para seus consumidores. `context.tsx` mantém esse contexto; `feedback.ts` faz o mapeamento para haptics de cada plataforma e trata falhas opcionais sem interromper ações. `index.tsx` mantém os reconhecedores nativos e animações, encaminha props nativas e desenha o blur atrás do conteúdo. Os tipos extraídos reexportam a definição local, evitando cópias divergentes.
 
 Removidos `expo-device`, `expo-image` e `expo-web-browser`, usados exclusivamente pelo starter. O Router ainda referencia `@expo/ui`, `expo-glass-effect` e os pacotes de gestos/animação; eles foram preservados, assim como a configuração SQLite e o cliente Supabase preexistentes. Nenhuma integração ou armazenamento foi implementado.
 
@@ -60,7 +65,7 @@ npx expo export --platform all
 git diff --check
 ```
 
-Os testes usam o runner nativo do Node e o TypeScript já instalado para carregar os tokens puros, sem alterar o formato de módulos do aplicativo. Exportar bundles não valida o comportamento do sistema nativo. No Expo Go SDK 58, conferir as quatro abas, safe areas, rolagem até o último item, fontes ampliadas, VoiceOver/TalkBack e abrir/voltar da apresentação de sessão. Na Web, conferir teclado, foco, acesso direto a `/session`, quatro abas e largura de 320 px.
+Os testes usam o runner nativo do Node e o TypeScript já instalado para carregar os tokens puros, sem alterar o formato de módulos do aplicativo. Os testes do pressable substituem o runtime nativo/animação para conferir props, callbacks, reset ao desabilitar, movimento/transparência reduzidos, configurações do provider, long press nativo, blur e falha de haptics; não medem FPS nem simulam gestos nativos. Exportar bundles não valida o comportamento do sistema nativo. No Expo Go SDK 58, conferir as quatro abas, safe areas, rolagem até o último item, fontes ampliadas, VoiceOver/TalkBack, feedback ao pressionar/cancelar, movimento/transparência reduzidos e abrir/voltar da apresentação de sessão. Na Web, conferir teclado, foco, acesso direto a `/session`, quatro abas e largura de 320 px.
 
 Próxima etapa funcional: auditar o Supabase existente, documentar schema/RLS e só então implementar Auth, conforme `AGENTS.md`.
 

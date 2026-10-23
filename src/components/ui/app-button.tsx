@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
   StyleSheet,
   type PressableProps,
 } from 'react-native';
 
 import { AppIcon, type AppIconName } from '@/components/ui/app-icon';
 import { AppText } from '@/components/ui/app-text';
+import { Pressable } from '@/shared/components/atoms/pressable';
 import { colors, radii, sizes, spacing } from '@/shared/theme';
 
 type AppButtonProps = Omit<PressableProps, 'children' | 'style'> & {
@@ -40,6 +40,8 @@ export function AppButton({
       aria-disabled={!!unavailable}
       aria-busy={loading}
       disabled={unavailable}
+      contentStyle={styles.content}
+      blur={{ enabled: variant === 'secondary' }}
       onFocus={(event) => {
         setFocused(true);
         props.onFocus?.(event);
@@ -76,10 +78,15 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
+    maxWidth: '100%',
   },
   primary: { backgroundColor: colors.accent },
   secondary: {

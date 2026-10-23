@@ -43,11 +43,40 @@ Não há comandos, terminal simulado ou dados de demonstração. Estatísticas s
 | ------------- | ---------------------------------------------------------------------------------- |
 | AppScreen     | Safe areas e scroll preservados; coluna de leitura e respiro entre blocos          |
 | AppText       | Sans por padrão; família mono apenas na variante `mono`                            |
-| AppButton     | Sans, toque de 48 pt, pressão e foco preservados; sem borda adicional              |
+| AppButton     | Sans, toque de 48 pt, spring e haptics suaves; blur secundário; foco preservado |
 | AppCard       | Superfície discreta, borda neutra de 1 pt e raio de 6 pt; sem cabeçalho de janela  |
 | AppIcon       | Ícones decorativos ocultos do leitor; neutros por padrão e sem molduras            |
 | ScreenHeader  | Título obrigatório; descrição e identificador mono opcionais, sem marcadores       |
 | SectionHeader | Apenas título sans, sem borda ou descrição redundante                              |
 | EmptyState    | Ícone ou identificador mono no mesmo espaço, título e descrição; sem card ou fundo |
 
-EmptyState aceita `icon` ou `identifier`, mutuamente exclusivos nos tipos. O identificador substitui o ícone e não cria um novo nível de cabeçalho. AppCard mantém somente props de View; não há labels ou variantes novas de painel. Nenhum componente ou dependência foi criado. Navegação nativa, ref Web, safe areas, fonte ampliada, foco, loading/disabled e retorno permanecem preservados.
+EmptyState aceita `icon` ou `identifier`, mutuamente exclusivos nos tipos. O identificador substitui o ícone e não cria um novo nível de cabeçalho. AppCard mantém somente props de View; não há labels ou variantes novas de painel. Navegação nativa, ref Web, safe areas, fonte ampliada, foco, loading/disabled e retorno permanecem preservados.
+
+## Feedback de toque — Reacticx
+
+O `AppButton` usa o [pressable do Reacticx](https://github.com/rit3zh/reacticx/tree/main/src/components/atoms/pressable), copiado pelo CLI 0.2.0 após `list` e `info`. Código e licença MIT em `src/shared/components/atoms/pressable/`; tipos públicos em `src/shared/types/pressable/` reexportam a definição local.
+
+Minimalismo se refere à composição, não à quantidade de recursos técnicos. A cópia mantém provider/contexto, pressão e long press, spring ou timing configuráveis, escala, opacidade, rotação, translação, worklet customizado, blur estático/animado, tipos de haptics, callback opcional de som e callback global com opt-out. Recursos podem ser configurados por controle sem ampliar a API do AppButton.
+
+O `PressableProvider` na raiz centraliza os padrões e acompanha mudanças nas preferências de movimento e transparência reduzidos. Não altera o roteamento. Long press usa o reconhecedor nativo de Pressable, que cancela ao rolar e dispara uma vez; substitui o timer manual para evitar ativações após cancelamento. Sem `onLongPress`, nenhum comando ou gesto novo é criado. Props de estado, foco, aria, loading/disabled e callbacks nativos são encaminhadas. Shared values usam `get`/`set` para React Compiler; animação customizada retorna `ViewStyle` e precisa ser um worklet.
+
+Tokens `motion`: escala de pressão `0.98`, escala de long press `0.96`, timing padrão `100` ms, limiar de long press `500` ms e spring `{ damping: 26, stiffness: 360, mass: 0.7 }`. O provider habilita spring nos botões; timing é usado com `useSpring: false`. O retorno fixo em 140 ms foi substituído pelo spring. Somente conteúdo se move; fundo, foco e área de toque ficam estáveis. A cor pressionada é imediata. Movimento reduzido mantém o conteúdo imóvel, inclusive para worklets customizados, sem impedir ações ou haptics. Sem provider, animações usam `ReduceMotion.System`; com provider, seguem a preferência atual observada, inclusive quando ela muda após abrir o app. Desabilitar durante uma pressão restaura o estado.
+
+Tokens `effects.buttonBlur`: intensidade `12`, pressionado `20`. “Voltar” usa uma camada escura, recortada nos mesmos cantos e atrás do rótulo; o CTA mantém o ciano sólido. A base opaca permanece para acessibilidade e fallback. Não se desfoca o texto nem se muda a hierarquia. O blur é desligado em controles indisponíveis ou com “Reduzir transparência” ativo no iOS.
+
+“Iniciar sessão” e “Voltar” recebem um impacto suave ao pressionar. Seleção, sucesso, aviso e erro continuam disponíveis, mas não são disparados sem uma ação real correspondente. O componente não aguarda haptics ou animações para navegar; falha de hardware não bloqueia a ação e gera somente aviso estático em desenvolvimento. O hook de som permanece opcional, sem áudio adicionado.
+
+### Compatibilidade de efeitos
+
+| Plataforma | Blur | Haptics |
+| --- | --- | --- |
+| iOS / Expo Go 58 | `expo-blur`, intensidade animada; respeita Reduzir transparência | Taptic Engine, impacto `Soft` nos botões; o sistema pode suprimi-lo em economia de energia ou pelas preferências |
+| Android 12+ / Expo Go 58 | `BlurTargetView` e `dimezisBlurViewSdk31Plus`; intensidade percebida pode diferir do iOS | `performAndroidHapticsAsync`; impacto suave usa `Context_Click`, seleção usa `Segment_Tick` |
+| Android anterior ao 12 | Superfície translúcida pelo fallback oficial, evitando o custo de RenderScript | Mecanismo nativo, sujeito ao hardware e às preferências |
+| Web | backdrop-filter do Expo; intensidade animada via estilo, conforme seu adaptador Web; sem filtro, conserva superfície e texto | API do Expo, dependente do navegador/hardware; sem promessa de vibração no desktop |
+
+No Android, sem `blurTarget` externo, o pressable cria um alvo local com a cor da superfície do controle: o material não captura nem desfoca o rótulo. Para desfocar conteúdo externo real, `BlurConfig` aceita `blurTarget`, `blurMethod` e `blurReductionFactor`; o alvo externo deve ser um `BlurTargetView` separado da camada de blur. A interface atual não simula conteúdo sob o botão para exagerar o efeito.
+
+Adicionados somente `expo-blur ~58.0.5` e `expo-haptics ~58.0.7`, via `npx expo install`, compatíveis com Expo Go. Reanimated 4.7.1, Worklets 0.13.0 e Gesture Handler já estavam instalados. Não é necessário Development Build. Configuração Reacticx intacta; `init` não executado. Futuras cópias com `--overwrite` precisam reaplicar e revisar as correções locais. Não foram instalados outros componentes ou exemplos: os recursos recuperados enriquecem as ações existentes, sem novos fluxos ou redesign.
+
+Referências: [Expo BlurView e Android](https://docs.expo.dev/versions/latest/sdk/blur-view/), [Expo Haptics](https://docs.expo.dev/versions/latest/sdk/haptics/), [Reanimated e React Compiler](https://docs.swmansion.com/react-native-reanimated/docs/core/useSharedValue/).

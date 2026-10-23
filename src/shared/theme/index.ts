@@ -2,7 +2,7 @@ import { DarkTheme } from 'expo-router';
 
 import { colors } from './tokens';
 
-export { colors, radii, shadows, sizes, spacing, typography } from './tokens';
+export { colors, effects, motion, radii, shadows, sizes, spacing, typography } from './tokens';
 export type { ThemeColor } from './tokens';
 export { fonts } from './fonts';
 
