@@ -29,7 +29,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version: "24"
           cache: npm
 
       - name: Install dependencies
@@ -44,6 +44,5 @@ jobs:
       - name: Expo Doctor
         run: npx --yes expo-doctor@latest
 
-      # Quando adicionar testes, defina `test:ci` no package.json.
-      - name: Unit tests (when configured)
-        run: npm run test:ci --if-present
+      - name: Unit tests
+        run: npm run test:ci
